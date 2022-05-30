@@ -37,12 +37,14 @@ import {
   defaultEmbedBubbleContent,
   ChoiceInputStep,
   ConditionStep,
+  defaultPaymentInputOptions,
 } from 'models'
 import { Typebot } from 'models'
 import useSWR from 'swr'
 import { fetcher, toKebabCase } from '../utils'
 import {
   isBubbleStepType,
+  isNotEmpty,
   isWebhookStep,
   omit,
   stepHasItems,
@@ -79,7 +81,9 @@ export const useTypebots = ({
     { typebots: TypebotInDashboard[] },
     Error
   >(workspaceId ? `/api/typebots?${params}` : null, fetcher, {
-    dedupingInterval: process.env.NEXT_PUBLIC_E2E_TEST ? 0 : undefined,
+    dedupingInterval: isNotEmpty(process.env.NEXT_PUBLIC_E2E_TEST)
+      ? 0
+      : undefined,
   })
   if (error) onError(error)
   return {
@@ -320,6 +324,8 @@ const parseDefaultStepOptions = (type: StepWithOptionsType): StepOptions => {
       return defaultUrlInputOptions
     case InputStepType.CHOICE:
       return defaultChoiceInputOptions
+    case InputStepType.PAYMENT:
+      return defaultPaymentInputOptions
     case LogicStepType.SET_VARIABLE:
       return defaultSetVariablesOptions
     case LogicStepType.REDIRECT:
